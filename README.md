@@ -12,8 +12,8 @@ Automatically places blocks according to an active Litematica schematic – just
 |---|---|
 | Minecraft | 1.21.1 |
 | NeoForge | 21.x |
-| [Litematica (NeoForge)](https://github.com/ThinkingStudios/Litematica-Forge) | 0.4.0-mc1.21.1 |
-| [MaLiLib (NeoForge)](https://github.com/ThinkingStudios/MaLib-Forge) | 0.4.3-mc1.21.1 |
+| [Litematica (NeoForge)](https://github.com/CagayakeGirls/litematica-neoforge) | 0.4.0-mc1.21.1 |
+| [MaLiLib (NeoForge)](https://github.com/CagayakeGirls/malilib-neoforge) | 0.4.3-mc1.21.1 |
 
 ---
 
