@@ -1,69 +1,118 @@
-# Forgematica Printer Reworked
+# NeoForgematica Printer
 
-An open-source NeoForge add-on for Forgematica that adds automatic schematic printing and improves placement behavior for directional and state-based blocks.
+An unofficial **NeoForge** port of the [Litematica Printer](https://github.com/aleksilassila/litematica-printer) mod for Minecraft **1.21.1**.
 
-Forgematica Printer Reworked is a maintained fork of the original Forgematica Printer project. It is designed to help players build large schematics faster by automatically placing the correct blocks around the player while improving reliability in more complex placement scenarios.
+Automatically places blocks according to an active Litematica schematic – just walk around your loaded schematic and the printer places every block in reach for you.
+
+---
+
+## Requirements
+
+| Dependency | Version |
+|---|---|
+| Minecraft | 1.21.1 |
+| NeoForge | 21.x |
+| [Litematica (NeoForge)](https://github.com/ThinkingStudios/Litematica-Forge) | 0.4.0-mc1.21.1 |
+| [MaLiLib (NeoForge)](https://github.com/ThinkingStudios/MaLib-Forge) | 0.4.3-mc1.21.1 |
+
+---
 
 ## Features
 
-- automatic schematic block placement for Forgematica
-- configurable printing speed and range
-- improved support for directional and state-based blocks
-- maintained for NeoForge
-- open-source fork with ongoing fixes and adjustments
+- **Auto-placement** of blocks within a configurable reach range
+- **Smart orientation** – player yaw/pitch is faked server-side to place directional blocks (barrels, dispensers, observers, etc.) in the correct facing
+- **Optional Air Place (Experimental)** – can directly place to target positions without a clickable support block for non-support-dependent blocks
+- **Sneak-placement** for container blocks (chests, barrels, shulker boxes, furnaces, hoppers, droppers, dispensers) – prevents accidentally opening the inventory after placement
+- **Trapdoor & door delay** – a short cooldown is injected after placing trapdoors/doors to avoid the state being re-toggled immediately
+- **Chest pairing** – single and double chests are placed correctly even when a neighbour chest is already present
+- **Log stripping** – places a regular log and strips it automatically if a stripped variant cannot be found in the inventory
+- **Fluid replacement** – optionally replaces fluid source blocks
+- **Block state interaction** – cycles block states (comparators, repeaters, note blocks, levers …) to match the schematic
+- **Built-in HUD overlay** – a configurable Jade-style tooltip displays the required block and target state when looking at a schematic position
 
-## How To Use
+---
 
-Using the printer is straightforward:
+## Configuration
 
-- Toggle the printer with `CAPS_LOCK` by default
-- Hold `V` by default to print temporarily, even if the printer is turned off
-- Open Forgematica settings with `M + C`
-- Printer-related settings can be found in the **Generic** tab
-- The printer toggle key can be changed in the **Hotkeys** tab
+All settings are accessible via **Litematica → Config → Generic** (and the **Info Overlays** tab for the HUD).
 
-## Fork Notice
+### Generic
 
-This project is a modified open-source fork based on the original Forgematica Printer work and related upstream projects.
+| Setting | Default | Description |
+|---|---|---|
+| Printing Interval | `12` | Ticks between each placement attempt. Lower = faster. Raise if ghost blocks appear or blocks face the wrong way. |
+| Printing Range | `5` | Max reach distance for placement (2.5–5 blocks). Lower values are safer on servers. |
+| Printing Mode | `false` | Keep the printer active at all times (no hotkey required). |
+| Printing Debug | `false` | Verbose debug logging to the game log. |
+| Replace Fluid Source Blocks | `true` | Allow the printer to replace fluid source blocks. |
+| Strip Logs | `true` | Use a regular log + axe if stripped logs are unavailable. |
+| Interact Blocks | `true` | Allow the printer to cycle block states (comparator delay, repeater delay, …). |
+| Block Orientation Fix (Experimental) | `false` | Extra validation pass for orientation-sensitive blocks. Reduce misfaced placements at the cost of speed. |
+| Disable Placing Doors/Trapdoors/etc. | `false` | Completely skip door-like blocks (doors, trapdoors, fence gates). |
+| Disable Placing Chests/Barrels/etc. | `false` | Completely skip storage blocks (chests, barrels, shulker boxes). |
+| Disable Placing Stairs | `false` | Completely skip all stair blocks. |
+| Disable Placing Slabs | `false` | Completely skip all slab blocks. |
+| Allow Air Place (Experimental) | `false` | Allow direct target-position placement without requiring a clickable support block for blocks that do not require support. |
 
-This fork is maintained independently. Please do not report issues from this version to the original upstream authors or to the original creator of Litematica.
+### Info Overlays (HUD)
 
-## Changes in this fork
+| Setting | Default | Description |
+|---|---|---|
+| Use Matica Overlay | `true` | Show the built-in schematic helper overlay. |
+| Font Size | `9` | Text size of the overlay (6–24). |
+| Background Color | `#101318` | Background fill colour. |
+| Font Color | `#E6ECF2` | Text colour. |
+| Position | `Top Center` | Screen position (Top/Bottom × Left/Center/Right). |
+| Transparency | `204` | Additional background transparency (0 = opaque, 255 = invisible). |
 
-This fork focuses on improving placement reliability and maintenance for newer NeoForge versions.
+---
 
-Current improvements include:
+## Hotkeys
 
-- improved stair placement direction handling
-- improved slab placement behavior in connected structures
-- improved trapdoor placement and interaction behavior
-- NeoForge 1.21.1 build support and maintenance updates
-- ongoing fixes for schematic auto-printing edge cases
+| Hotkey | Default | Description |
+|---|---|---|
+| Print | *(unbound)* | Hold to print while the key is pressed. |
+| Toggle Printing Mode | *(unbound)* | Toggle auto-print mode on/off. |
 
-## Reporting Issues
+Hotkeys are configured under **Litematica → Config → Hotkeys**.
 
-If you encounter a bug or want to request a feature, please use the issue tracker for this fork:
+---
 
-[GitHub Issues](https://github.com/ThinkingStudio/ForgematicaPrinter/issues)
+## Usage
 
-Before creating an issue, please make sure you are using the latest available version and include as much useful information as possible, such as:
+1. Load a schematic in Litematica and activate a placement.
+2. Either hold the **Print** hotkey or enable **Printing Mode**.
+3. Walk near the blocks that need to be placed – the printer fills them in automatically.
 
-- Minecraft version
-- Forgematica version
-- Printer version
-- a clear description of how to reproduce the problem
-- logs, screenshots, or incorrectly printed schematics if available
+> **Tip:** If blocks are placed with the wrong orientation, try increasing the **Printing Interval**. The default value of `12` is a good starting point for most setups.
 
-## Known Issues
+---
 
-The following limitations are still known:
+## Known Limitations
 
-- placing liquids is not fully supported, although printing inside liquids may still work
-- printing unsupported blocks directly in mid-air (`printInAir`) is still incomplete
-- rail placement is not perfect in every situation and may refuse to place rails rather than place them incorrectly
-- compatibility with strict anti-cheat environments is still uncertain
+- **Placing liquids** (water/lava source placement) is not fully implemented yet.
+- **Rails** use a conservative algorithm; in complex cases some rails may be skipped to avoid incorrect placements.
+- **Optional Air Place** is experimental and can be more sensitive to server behavior and edge-case block states.
+- **Legit mode / anticheat-friendly behavior** is not yet a dedicated mode and may need manual tuning (for example higher printing interval).
 
-Features intended to repair or rewrite existing builds, such as automatic excavation or automatic correction of wrongly placed blocks, are currently outside the scope of this fork.
+---
+
+## Development Note
+
+This project uses **GitHub Copilot** during development.
+
+Even with reviews and testing, bugs, regressions, or edge-case placement issues can still occur.
+If you find an issue, please report it with reproduction steps so it can be fixed quickly.
+
+---
+
+## Credits
+
+- **aleksilassila** – original Litematica Printer (Fabric)
+- **TexTrue / ThinkingStudio** – NeoForge port of Litematica & MaLiLib
+- This project builds on their work
+
+---
 
 ## Source Code and License
 
