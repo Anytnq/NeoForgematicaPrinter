@@ -65,9 +65,6 @@ tasks.withType<ProcessResources> {
 }
 
 publisher {
-    apiKeys.modrinth(System.getenv("MODRINTH_TOKEN"))
-    apiKeys.curseforge(System.getenv("CURSEFORGE_TOKEN"))
-
     curseID.set("$curseforge_id")
     modrinthID.set("$modrinth_id")
     versionType.set("alpha")
