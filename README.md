@@ -110,6 +110,7 @@ If you find an issue, please report it with reproduction steps so it can be fixe
 
 - **aleksilassila** – original Litematica Printer (Fabric)
 - **TexTrue / ThinkingStudio** – NeoForge port of Litematica & MaLiLib
+- **Reime0** – Forgematica Printer Rework
 - This project builds on their work
 
 ---
@@ -120,3 +121,4 @@ This fork is released under the GNU Affero General Public License v3.0.
 
 Source code:
 https://github.com/ThinkingStudio/ForgematicaPrinter
+https://github.com/Reime0/NeoForgematicaPrinter
