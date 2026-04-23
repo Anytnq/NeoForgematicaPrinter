@@ -14,9 +14,6 @@ val forgematica_version: String by project
 val archives_base_name: String by project
 val mod_version: String by project
 
-val curseforge_id: String by project
-val modrinth_id: String by project
-
 base.archivesName = archives_base_name
 version = "${mod_version}+mc${minecraft_version}"
 
@@ -65,8 +62,6 @@ tasks.withType<ProcessResources> {
 }
 
 publisher {
-    curseID.set("$curseforge_id")
-    modrinthID.set("$modrinth_id")
     versionType.set("alpha")
     changelog.set(file("CHANGELOG.md"))
     displayName.set("${mod_version}+mc${minecraft_version}")
