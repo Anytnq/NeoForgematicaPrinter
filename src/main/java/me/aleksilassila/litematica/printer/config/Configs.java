@@ -17,9 +17,11 @@ public class Configs {
   private static final String OVERLAY_KEY =
       PrinterReference.MOD_KEY + ".config.overlay";
 
-  // Configs settings
   public static final ConfigInteger PRINTING_INTERVAL =
       new ConfigInteger("printingInterval", 12, 1, 40).apply(GENERIC_KEY);
+  public static final ConfigInteger DUPLICATE_PLACE_COOLDOWN_TICKS =
+      new ConfigInteger("duplicatePlaceCooldownTicks", 12, 0, 80)
+          .apply(GENERIC_KEY);
   public static final ConfigDouble PRINTING_RANGE =
       new ConfigDouble("printingRange", 5, 2.5, 5).apply(GENERIC_KEY);
   public static final ConfigBoolean PRINT_MODE =
@@ -35,6 +37,13 @@ public class Configs {
   public static final ConfigBoolean BLOCK_ORIENTATION_FIX_EXPERIMENTAL =
       new ConfigBoolean("blockOrientationFixExperimental", false)
           .apply(GENERIC_KEY);
+  public static final ConfigBoolean GUESSER_TORCH_FIX_EXPERIMENTAL =
+      new ConfigBoolean("guesserTorchFixExperimental", false)
+          .apply(GENERIC_KEY);
+  public static final ConfigBoolean SIGN_CLICK_FIX_EXPERIMENTAL =
+      new ConfigBoolean("signClickFixExperimental", false).apply(GENERIC_KEY);
+  public static final ConfigBoolean RAIL_GUESSER_FIX_EXPERIMENTAL =
+      new ConfigBoolean("railGuesserFixExperimental", false).apply(GENERIC_KEY);
   public static final ConfigBoolean DISABLE_PLACING_DOORS_TRAPDOORS =
       new ConfigBoolean("disablePlacingDoorsTrapdoors", false)
           .apply(GENERIC_KEY);
@@ -48,7 +57,6 @@ public class Configs {
   public static final ConfigBoolean ALLOW_AIR_PLACE =
       new ConfigBoolean("allowAirPlace", false).apply(GENERIC_KEY);
 
-  // Overlay settings (Info Overlays tab)
   public static final ConfigBoolean USE_MATICA_OVERLAY =
       new ConfigBoolean("useMaticaOverlay", true).apply(OVERLAY_KEY);
   public static final ConfigInteger OVERLAY_FONT_SIZE =
@@ -69,11 +77,15 @@ public class Configs {
     list.add(PRINT_MODE);
     list.add(PRINT_DEBUG);
     list.add(PRINTING_INTERVAL);
+    list.add(DUPLICATE_PLACE_COOLDOWN_TICKS);
     list.add(PRINTING_RANGE);
     list.add(REPLACE_FLUIDS_SOURCE_BLOCKS);
     list.add(STRIP_LOGS);
     list.add(INTERACT_BLOCKS);
     list.add(BLOCK_ORIENTATION_FIX_EXPERIMENTAL);
+    list.add(GUESSER_TORCH_FIX_EXPERIMENTAL);
+    list.add(SIGN_CLICK_FIX_EXPERIMENTAL);
+    list.add(RAIL_GUESSER_FIX_EXPERIMENTAL);
     list.add(DISABLE_PLACING_DOORS_TRAPDOORS);
     list.add(DISABLE_PLACING_CHESTS_CONTAINERS);
     list.add(DISABLE_PLACING_STAIRS);

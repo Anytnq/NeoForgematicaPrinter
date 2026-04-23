@@ -26,10 +26,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
 
-
-/**
- * Guide that clicks its neighbors to create a placement in target position.
- */
 abstract public class PlacementGuide extends Guide {
   public PlacementGuide(SchematicBlockState state) { super(state); }
 
@@ -98,8 +94,6 @@ abstract public class PlacementGuide extends Guide {
     ItemPlacementContext ctx = getPlacementContext(player);
     if (ctx == null || !ctx.canPlace())
       return false;
-    //        if (!state.currentState.getMaterial().isReplaceable()) return
-    //        false;
     if (!Configs.REPLACE_FLUIDS_SOURCE_BLOCKS.getBooleanValue() &&
         getProperty(state.currentState, FluidBlock.LEVEL).orElse(1) == 0)
       return false;
@@ -134,9 +128,18 @@ abstract public class PlacementGuide extends Guide {
   }
 
   protected static boolean canBeClicked(World world, BlockPos pos) {
-    return getOutlineShape(world, pos) != VoxelShapes.empty() &&
-        !(world.getBlockState(pos).getBlock() instanceof
-          AbstractSignBlock); // FIXME signs
+    if (getOutlineShape(world, pos) == VoxelShapes.empty()) {
+      return false;
+    }
+
+    Block block = world.getBlockState(pos).getBlock();
+
+    if (block instanceof AbstractSignBlock &&
+        !Configs.SIGN_CLICK_FIX_EXPERIMENTAL.getBooleanValue()) {
+      return false;
+    }
+
+    return true;
   }
 
   private static VoxelShape getOutlineShape(World world, BlockPos pos) {
@@ -163,16 +166,6 @@ abstract public class PlacementGuide extends Guide {
                !blockState.isOf(Blocks.LADDER) &&
                !blockState.isOf(Blocks.SUGAR_CANE) &&
                !blockState.isOf(Blocks.BUBBLE_COLUMN)) {
-      //            Material material = blockState.getMaterial();
-      //            if (material != Material.PORTAL && material !=
-      //            Material.STRUCTURE_VOID && material !=
-      //            Material.UNDERWATER_PLANT && material !=
-      //            Material.REPLACEABLE_UNDERWATER_PLANT) {
-      //                return material.blocksMovement();
-      //            } else {
-      //                return true;
-      //            }
-      // TODO --> if this ever gets removed
       return blockState.blocksMovement();
     }
 

@@ -9,7 +9,6 @@ import me.aleksilassila.litematica.printer.guides.interaction.*;
 import me.aleksilassila.litematica.printer.guides.placement.*;
 import net.minecraft.block.*;
 
-
 public class Guides {
   protected static final List<GuideEntry> guides = new ArrayList<>();
 
@@ -51,9 +50,6 @@ public class Guides {
   }
 
   static {
-    // registerGuide(SkipGuide.class, AbstractSignBlock.class, SkullBlock.class,
-    // BannerBlock.class);
-
     registerGuide(RotatingBlockGuide.class, AbstractSkullBlock.class,
                   AbstractSignBlock.class, AbstractBannerBlock.class);
     registerGuide(SlabGuide.class, SlabBlock.class);

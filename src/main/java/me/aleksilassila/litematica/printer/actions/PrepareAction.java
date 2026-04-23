@@ -23,7 +23,6 @@ public class PrepareAction extends Action {
     Direction lookDirection = context.lookDirection;
 
     if (lookDirection != null && lookDirection.getAxis().isHorizontal()) {
-      // getHorizontal() returns 0..3 (S/W/N/E); multiply by 90 to get degrees
       this.yaw = lookDirection.getHorizontal() * 90f;
     } else {
       this.modifyYaw = false;
@@ -56,7 +55,6 @@ public class PrepareAction extends Action {
     if (itemStack != null && client.interactionManager != null) {
       PlayerInventory inventory = player.getInventory();
 
-      // This thing is straight from MinecraftClient#doItemPick()
       if (player.getAbilities().creativeMode) {
         this.addPickBlock(inventory, itemStack);
         client.interactionManager.clickCreativeStack(
@@ -65,7 +63,6 @@ public class PrepareAction extends Action {
         if (PlayerInventory.isValidHotbarIndex(slot)) {
           inventory.selectedSlot = slot;
         } else {
-          // client.interactionManager.pickFromInventory(slot);
           InventoryUtils.setPickedItemToHand(slot, itemStack, client);
         }
       }

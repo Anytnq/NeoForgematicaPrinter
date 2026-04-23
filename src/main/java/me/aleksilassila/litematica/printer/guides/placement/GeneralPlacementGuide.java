@@ -17,7 +17,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-
 /**
  * An old school guide where there are defined specific conditions
  * for player state depending on the block being placed.
@@ -65,9 +64,7 @@ public class GeneralPlacementGuide extends PlacementGuide {
           continue;
         }
 
-        if (canBeClicked(neighborState.world,
-                         neighborState.blockPos) && // Handle unclickable grass
-                                                    // for example
+        if (canBeClicked(neighborState.world, neighborState.blockPos) &&
             !neighborState.currentState.isReplaceable())
           validSides.add(side);
       }
@@ -141,7 +138,6 @@ public class GeneralPlacementGuide extends PlacementGuide {
     } catch (Exception e) {
       Printer.logger.error("getPlacementContext(): Exception caught: {}",
                            e.getMessage());
-      // e.printStackTrace();
       return null;
     }
   }

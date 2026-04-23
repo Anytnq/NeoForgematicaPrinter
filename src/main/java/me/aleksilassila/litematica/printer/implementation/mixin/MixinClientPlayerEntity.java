@@ -3,6 +3,7 @@ package me.aleksilassila.litematica.printer.implementation.mixin;
 import com.mojang.authlib.GameProfile;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import fi.dy.masa.litematica.world.WorldSchematic;
+import java.util.Optional;
 import me.aleksilassila.litematica.printer.LitematicaMixinMod;
 import me.aleksilassila.litematica.printer.Printer;
 import me.aleksilassila.litematica.printer.SchematicBlockState;
@@ -22,70 +23,67 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
-
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity extends AbstractClientPlayerEntity {
 
-    @Final
-    @Shadow
-    protected MinecraftClient client;
-    @Final
-    @Shadow
-    public ClientPlayNetworkHandler networkHandler;
+  @Final @Shadow protected MinecraftClient client;
+  @Final @Shadow public ClientPlayNetworkHandler networkHandler;
 
-    public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
-        super(world, profile);
+  public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
+    super(world, profile);
+  }
+
+  @Inject(at = @At("TAIL"), method = "tick")
+  public void tick(CallbackInfo ci) {
+    ClientPlayerEntity clientPlayer = (ClientPlayerEntity)(Object)this;
+
+    if (LitematicaMixinMod.printer == null ||
+        LitematicaMixinMod.printer.player != clientPlayer) {
+      Printer.printDebug("Initializing printer, player: {}, client: {}",
+                         clientPlayer, client);
+      LitematicaMixinMod.printer = new Printer(client, clientPlayer);
     }
 
-    @Inject(at = @At("TAIL"), method = "tick")
-    public void tick(CallbackInfo ci) {
-        ClientPlayerEntity clientPlayer = (ClientPlayerEntity) (Object) this;
+    boolean didFindPlacement = true;
+    for (int i = 0; i < 10; i++) {
+      if (didFindPlacement) {
+        didFindPlacement = LitematicaMixinMod.printer.onGameTick();
+      }
+      LitematicaMixinMod.printer.actionHandler.onGameTick();
+    }
+  }
 
-        if (LitematicaMixinMod.printer == null || LitematicaMixinMod.printer.player != clientPlayer) {
-            Printer.printDebug("Initializing printer, player: {}, client: {}", clientPlayer, client);
-            LitematicaMixinMod.printer = new Printer(client, clientPlayer);
-        }
+  @Inject(method = "openEditSignScreen", at = @At("HEAD"), cancellable = true)
+  public void openEditSignScreen(SignBlockEntity sign, boolean front,
+                                 CallbackInfo ci) {
+    getTargetSignEntity(sign).ifPresent(signBlockEntity -> {
+      UpdateSignC2SPacket packet = new UpdateSignC2SPacket(
+          sign.getPos(), front,
+          signBlockEntity.getText(front).getMessage(0, false).getString(),
+          signBlockEntity.getText(front).getMessage(1, false).getString(),
+          signBlockEntity.getText(front).getMessage(2, false).getString(),
+          signBlockEntity.getText(front).getMessage(3, false).getString());
+      this.networkHandler.send(packet);
+      ci.cancel();
+    });
+  }
 
-        // Dirty optimization
-        boolean didFindPlacement = true;
-        for (int i = 0; i < 10; i++) {
-            if (didFindPlacement) {
-                didFindPlacement = LitematicaMixinMod.printer.onGameTick();
-            }
-            LitematicaMixinMod.printer.actionHandler.onGameTick();
-        }
+  @Unique
+  private Optional<SignBlockEntity> getTargetSignEntity(SignBlockEntity sign) {
+    WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
+    if (sign.getWorld() == null || worldSchematic == null) {
+      return Optional.empty();
     }
 
-    @Inject(method = "openEditSignScreen", at = @At("HEAD"), cancellable = true)
-    public void openEditSignScreen(SignBlockEntity sign, boolean front, CallbackInfo ci) {
-        getTargetSignEntity(sign).ifPresent(signBlockEntity ->
-        {
-            UpdateSignC2SPacket packet = new UpdateSignC2SPacket(sign.getPos(),
-                    front,
-                    signBlockEntity.getText(front).getMessage(0, false).getString(),
-                    signBlockEntity.getText(front).getMessage(1, false).getString(),
-                    signBlockEntity.getText(front).getMessage(2, false).getString(),
-                    signBlockEntity.getText(front).getMessage(3, false).getString());
-            this.networkHandler.send(packet);
-            ci.cancel();
-        });
+    SchematicBlockState state =
+        new SchematicBlockState(sign.getWorld(), worldSchematic, sign.getPos());
+    BlockEntity targetBlockEntity =
+        worldSchematic.getBlockEntity(state.blockPos);
+
+    if (targetBlockEntity instanceof SignBlockEntity targetSignEntity) {
+      return Optional.of(targetSignEntity);
     }
 
-    @Unique
-    private Optional<SignBlockEntity> getTargetSignEntity(SignBlockEntity sign) {
-        WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
-        if (sign.getWorld() == null || worldSchematic == null) {
-            return Optional.empty();
-        }
-
-        SchematicBlockState state = new SchematicBlockState(sign.getWorld(), worldSchematic, sign.getPos());
-        BlockEntity targetBlockEntity = worldSchematic.getBlockEntity(state.blockPos);
-
-        if (targetBlockEntity instanceof SignBlockEntity targetSignEntity) {
-            return Optional.of(targetSignEntity);
-        }
-
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }

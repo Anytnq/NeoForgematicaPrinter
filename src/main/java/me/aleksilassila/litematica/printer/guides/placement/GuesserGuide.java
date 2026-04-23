@@ -7,6 +7,8 @@ import me.aleksilassila.litematica.printer.implementation.PrinterPlacementContex
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.SlabBlock;
+import net.minecraft.block.TorchBlock;
+import net.minecraft.block.WallTorchBlock;
 import net.minecraft.block.enums.ChestType;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -14,7 +16,6 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-
 
 /**
  * This is the placement guide that most blocks will use.
@@ -57,9 +58,7 @@ public class GuesserGuide extends GeneralPlacementGuide {
         boolean requiresShift = getRequiresExplicitShift() ||
                                 isInteractive(neighborState.getBlock());
 
-        if (!canBeClicked(
-                state.world,
-                neighborPos) || // Handle unclickable grass for example
+        if (!canBeClicked(state.world, neighborPos) ||
             neighborState.isReplaceable())
           continue;
 
@@ -78,13 +77,14 @@ public class GuesserGuide extends GeneralPlacementGuide {
           PrinterPlacementContext context =
               new PrinterPlacementContext(player, hitResult, requiredItem, slot,
                                           lookDirection, requiresShift);
-          BlockState result =
-              getRequiredItemAsBlock(player)
-                  .orElse(targetState.getBlock())
-                  .getPlacementState(
-                      context); // FIXME torch shift clicks another torch and
-                                // getPlacementState
-          // is the clicked block, which is true
+          BlockState result = getRequiredItemAsBlock(player)
+                                  .orElse(targetState.getBlock())
+                                  .getPlacementState(context);
+
+          if (Configs.GUESSER_TORCH_FIX_EXPERIMENTAL.getBooleanValue() &&
+              !isValidExperimentalTorchGuess(result, neighborState)) {
+            continue;
+          }
 
           if (result != null && (statesEqual(result, targetState) ||
                                  correctChestPlacement(targetState, result))) {
@@ -132,7 +132,7 @@ public class GuesserGuide extends GeneralPlacementGuide {
   @Override
   public boolean canExecute(ClientPlayerEntity player) {
     if (targetState.getBlock() instanceof SlabBlock)
-      return false; // Slabs are a special case
+      return false;
 
     return super.canExecute(player);
   }
@@ -150,5 +150,24 @@ public class GuesserGuide extends GeneralPlacementGuide {
     }
 
     return false;
+  }
+
+  private boolean isValidExperimentalTorchGuess(@Nullable BlockState result,
+                                                BlockState neighborState) {
+    if (result == null) {
+      return false;
+    }
+
+    if (!result.canPlaceAt(state.world, state.blockPos)) {
+      return false;
+    }
+
+    boolean torchLikeTarget = targetState.getBlock() instanceof TorchBlock ||
+                              targetState.getBlock() instanceof WallTorchBlock;
+    boolean clickedTorchLike =
+        neighborState.getBlock() instanceof TorchBlock ||
+        neighborState.getBlock() instanceof WallTorchBlock;
+
+    return !(torchLikeTarget && clickedTorchLike);
   }
 }
